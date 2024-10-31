@@ -66,9 +66,12 @@ class SMILESProteinDataset(Dataset):
         self.protein_repr = self._load_protein_repr(join(self. embed_dir, "Protein", self.prot_dicts[self.protein_subset_no]))
 
         if self.protein_subset_no == 0:
+            print(f"{self.protein_subset_no = }, {self.smiles_subset_no = }, {self.subset_no = }")
+            print(f"{self.smiles_dicts = }")
             smiles_repr_file = join(self.embed_dir, "SMILES", self.smiles_dicts[self.smiles_subset_no])
             self.smiles_reprs = self._load_smiles_repr(smiles_repr_file)
-            self.smiles_subset_no += 1
+            if self.smiles_subset_no < len(self.smiles_dicts) - 1:
+                self.smiles_subset_no += 1
 
         self.subset_no +=1
 
