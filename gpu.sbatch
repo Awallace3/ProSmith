@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -JGPCR
-#SBATCH -ot1.out
+#SBATCH -ot2.out
 #SBATCH -Ahive-cs207
 #SBATCH -N1 --ntasks=1 --cpus-per-task=8 -G1
 #SBATCH --mem-per-cpu=8G
