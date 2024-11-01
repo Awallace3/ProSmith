@@ -528,45 +528,66 @@ def evaluate_split_performance(model, dloader, gpu, device, binary_task,
     plot_ROC_path = "./plots/ROC_curve.png",
                                ):
     # print(f"dloader size: {len(dloader)}")
-    y_true, y_pred = eval_dataloader(model, dloader, gpu, device, binary_task)
-    y_pred = np.rint(y_pred)
-    results = np.hstack((y_true, y_pred))
-    y_true = results[:, 0]
-    y_pred = results[:, 1]
-    # print(results[:10, :])
+    if binary_task:
+        y_true, y_pred = eval_dataloader(model, dloader, gpu, device, binary_task)
+        if binary_task:
+            y_pred = np.rint(y_pred)
+        results = np.hstack((y_true, y_pred))
+        y_true = results[:, 0]
+        y_pred = results[:, 1]
+        # print(results[:10, :])
 
-    true_positives = np.sum(np.logical_and(y_true == 1, y_pred == 1))
-    false_positives = np.sum(np.logical_and(y_true == 0, y_pred == 1))
-    false_negative = np.sum(np.logical_and(y_true == 1, y_pred == 0))
-    print(f"True positives: {true_positives}")
-    print(f"False positives: {false_positives}")
-    print(f"False negatives: {false_negative}")
-    vals = len(y_true)
-    correct = np.sum(np.equal(y_true, y_pred))
-    binding_ligands_cnt_true = np.sum(y_true)
-    binding_ligands_cnt_pred = np.sum(y_pred)
-    percent_correct = correct / vals
-    print(f"correct / total: {correct} / {vals}\nAccuracy: {percent_correct}")
-    print(f"TRUE binding : non-binding = {binding_ligands_cnt_true} : {vals - binding_ligands_cnt_true}")
-    print(f"PRED binding : non-binding = {binding_ligands_cnt_pred} : {vals - binding_ligands_cnt_pred}")
-
-    fpr, tpr, thresholds = metrics.roc_curve(y_true, y_pred)
-    roc_auc = metrics.auc(fpr, tpr)
-    display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc,
-                                      estimator_name='example estimator')
-    display.plot()
-    plt.savefig(plot_ROC_path)
+        true_positives = np.sum(np.logical_and(y_true == 1, y_pred == 1))
+        false_positives = np.sum(np.logical_and(y_true == 0, y_pred == 1))
+        false_negative = np.sum(np.logical_and(y_true == 1, y_pred == 0))
+        print(f"True positives: {true_positives}")
+        print(f"False positives: {false_positives}")
+        print(f"False negatives: {false_negative}")
+        vals = len(y_true)
+        correct = np.sum(np.equal(y_true, y_pred))
+        binding_ligands_cnt_true = np.sum(y_true)
+        binding_ligands_cnt_pred = np.sum(y_pred)
+        percent_correct = correct / vals
+        print(f"correct / total: {correct} / {vals}\nAccuracy: {percent_correct}")
+        print(f"TRUE binding : non-binding = {binding_ligands_cnt_true} : {vals - binding_ligands_cnt_true}")
+        print(f"PRED binding : non-binding = {binding_ligands_cnt_pred} : {vals - binding_ligands_cnt_pred}")
+        fpr, tpr, thresholds = metrics.roc_curve(y_true, y_pred)
+        roc_auc = metrics.auc(fpr, tpr)
+        display = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc,
+                                          estimator_name='example estimator')
+        display.plot()
+        plt.savefig(plot_ROC_path)
+    else:
+        y_true, y_pred = eval_dataloader(model, dloader, gpu, device, binary_task)
+        results = np.hstack((y_true, y_pred))
+        # MSE loss 
+        loss = np.mean((results[:, 0] - results[:, 1]) ** 2)
+        print(f"MSE Loss: {loss}")
+        # print(f"R2 score: {r_squared_error(y_true, y_pred)}")
+        print(results[:10, :])
     return
 
 
 def main():
-    val_dir = "./data_dir/HT4_prosmith_test2/train_val/val.csv"
-    train_dir = "./data_dir/HT4_prosmith_test2/train_val/train.csv"
-    test_dir = "./data_dir/HT4_prosmith_test2/train_val/test.csv"
+    version = "T2"
+    if version == "T1":
+        # T1
+        val_dir = "./data_dir/HT4_prosmith_test2/train_val/val.csv"
+        train_dir = "./data_dir/HT4_prosmith_test2/train_val/train.csv"
+        test_dir = "./data_dir/HT4_prosmith_test2/train_val/test.csv"
+        pretrained_model = "./data_dir/HT4_prosmith_test2/saved_model/HT4_1_1gpus_bs24_1e-05_layers6.txt.pkl"
+        binary_task = True
+    elif version == "T2":
+        # T2
+        val_dir = "./data_dir/prosmith_test2/train_val/val.csv"
+        train_dir = "./data_dir/prosmith_test2/train_val/train.csv"
+        test_dir = "./data_dir/prosmith_test2/train_val/test.csv"
+        pretrained_model = "./data_dir/HT4_prosmith_test2/saved_model/HT4_1_1gpus_bs24_1e-05_layers6.txt.pkl"
+        binary_task = False
+    else:
+        raise ValueError("Invalid version")
 
-    pretrained_model = "./data_dir/HT4_prosmith_test2/saved_model/HT4_1_1gpus_bs24_1e-05_layers6.txt.pkl"
     embed_path = "./data_dir/HT4_prosmith_test2/embeddings"
-    binary_task = True
     gpu = 0
     if torch.cuda.is_available():
         device = torch.device('cuda')
