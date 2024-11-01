@@ -569,7 +569,7 @@ def evaluate_split_performance(model, dloader, gpu, device, binary_task,
 
 
 def main():
-    version = "T2"
+    version = "T4"
     if version == "T1":
         # T1
         val_dir = "./data_dir/HT4_prosmith_test2/train_val/val.csv"
@@ -583,6 +583,13 @@ def main():
         train_dir = "./data_dir/prosmith_test2/train_val/train.csv"
         test_dir = "./data_dir/prosmith_test2/train_val/test.csv"
         pretrained_model = "./data_dir/HT4_prosmith_test2/saved_model/HT4_1_1gpus_bs24_1e-05_layers6.txt.pkl"
+        binary_task = False
+    elif version == "T4":
+        # T4
+        val_dir = "./data_dir/prosmith_test4/train_val/val.csv"
+        train_dir = "./data_dir/prosmith_test4/train_val/train.csv"
+        test_dir = "./data_dir/prosmith_test4/train_val/test.csv"
+        pretrained_model = "./data_dir/HT4_prosmith_test4/saved_model/HT4_1_1gpus_bs24_1e-05_layers6.txt.pkl"
         binary_task = False
     else:
         raise ValueError("Invalid version")
