@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -JGPCR
-#SBATCH -ot4.out
+#SBATCH -ot5.out
 #SBATCH -Ahive-cs207
 #SBATCH -N1 --ntasks=1 --cpus-per-task=8 -G1
 #SBATCH --mem-per-cpu=8G
@@ -19,8 +19,23 @@ python3 -u main.py
 
 cd ../ProSmith/
 
-bash ./preprocess.sh
+export iter=4
+export data_dir=./data_dir/prosmith_test$iter
+
+python ./code/preprocessing/preprocessing.py \
+    --train_val_path \
+    $data_dir/train_val/ \
+    --outpath \
+    $data_dir/embeddings \
+    --smiles_emb_no 2000 --prot_emb_no 2000
 echo "preprocessing done"
-bash ./orml_train.sh
-python3 -u ./eval.py
+python ./code/training/training.py \
+    --pretrained_model "./data_dir/training_data/BindingDB/saved_model/pretraining_IC50_6gpus_bs144_1.5e-05_layers6.txt.pkl" \
+    --train_dir $data_dir/train_val/train.csv \
+    --val_dir $data_dir/train_val/test.csv \
+    --save_model_path $data_dir/saved_model \
+    --embed_path $data_dir/embeddings \
+    --learning_rate 1e-5  --num_hidden_layers 6 --batch_size 24 \
+    --log_name prosmith_$iter --num_train_epochs 100 \
+python3 -u ./eval.py --iter $iter
 echo "finished job!"
