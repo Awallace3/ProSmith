@@ -12,6 +12,8 @@ from Bio import SeqIO
 def calculate_protein_embeddings(all_sequences, outpath, prot_emb_no = 1000):
     create_empty_path(join(outpath, "Protein"))
     fasta_file = join(outpath, "all_sequences.fasta")
+    print(all_sequences[:10])
+    print(fasta_file)
     create_fasta_file(all_sequences, fasta_file)
 
     model, alphabet = pretrained.load_model_and_alphabet("esm1b_t33_650M_UR50S")
@@ -87,6 +89,7 @@ def merge_protein_emb_files(output_dir, outpath, fasta_file, prot_emb_no):
 def create_fasta_file(sequences, filename):
     ofile = open(filename, "w")
     for k, seq in enumerate(sequences):
+        print(k, seq)
         ofile.write(">" + str(k) + "\n" + seq[:1018]  + "\n")
     ofile.close()
 

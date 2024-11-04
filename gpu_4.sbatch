@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH -JGPCR
-#SBATCH -ot5.out
+#SBATCH -JGPCR-4
+#SBATCH -ot4.out
 #SBATCH -Ahive-cs207
-#SBATCH -N1 --ntasks=1 --cpus-per-task=8 -G1
+#SBATCH -N1 --ntasks=1 --cpus-per-task=16 -G2
 #SBATCH --mem-per-cpu=8G
 #SBATCH -t72:00:00
 #SBATCH -phive-gpu
@@ -10,15 +10,12 @@
 #SBATCH --mail-user=awallace43@gatech.edu
 
 
-cd $HOME/data/gits/gpcr_ml/phillip
+cd /storage/hive/project/chem-sherrill/awallace43/gits/gpcr_ml/ProSmith
+
 source ~/data/miniconda3/etc/profile.d/conda.sh
 conda activate /storage/hive/project/chem-sherrill/awallace43/.conda/envs/prosmith
 
 echo "starting job..."
-python3 -u main.py
-
-cd ../ProSmith/
-
 export iter=4
 export data_dir=./data_dir/prosmith_test$iter
 
@@ -35,7 +32,8 @@ python ./code/training/training.py \
     --val_dir $data_dir/train_val/test.csv \
     --save_model_path $data_dir/saved_model \
     --embed_path $data_dir/embeddings \
-    --learning_rate 1e-5  --num_hidden_layers 6 --batch_size 24 \
-    --log_name prosmith_$iter --num_train_epochs 100 \
+    --learning_rate 1e-5  --num_hidden_layers 6 --batch_size 12 \
+    --log_name prosmith_$iter --num_train_epochs 100 
+
 python3 -u ./eval.py --iter $iter
 echo "finished job!"
