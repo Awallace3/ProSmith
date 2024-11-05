@@ -19,13 +19,13 @@ echo "starting job..."
 export iter=4
 export data_dir=./data_dir/prosmith_test$iter
 
-python ./code/preprocessing/preprocessing.py \
-    --train_val_path \
-    $data_dir/train_val/ \
-    --outpath \
-    $data_dir/embeddings \
-    --smiles_emb_no 2000 --prot_emb_no 2000
-echo "preprocessing done"
+# python ./code/preprocessing/preprocessing.py \
+#     --train_val_path \
+#     $data_dir/train_val/ \
+#     --outpath \
+#     $data_dir/embeddings \
+#     --smiles_emb_no 2000 --prot_emb_no 2000
+# echo "preprocessing done"
 python ./code/training/training.py \
     --pretrained_model "./data_dir/training_data/BindingDB/saved_model/pretraining_IC50_6gpus_bs144_1.5e-05_layers6.txt.pkl" \
     --train_dir $data_dir/train_val/train.csv \
