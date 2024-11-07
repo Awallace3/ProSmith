@@ -666,6 +666,12 @@ def main():
         required=True,
         help="Path that contains subfolders SMILES and Protein with embedding dictionaries",
     )
+    parser.add_argument(
+        "--roc_plot_path",
+        type=str,
+        default="./plots/ROC_curve.png",
+        help="Path to save ROC plot",
+    )
     args = parser.parse_args()
     print(args)
     val_csv = args.val_csv
@@ -674,6 +680,7 @@ def main():
     pretrained_model = args.pretrained_model
     binary_task = args.binary_task
     embed_path = args.embed_path
+    roc_plot_path = args.roc_plot_path
     gpu = 0
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -686,13 +693,13 @@ def main():
     model = load_model(pretrained_model, device, binary_task)
     print("\nVal\n")
     loader_v = load_data(val_csv, embed_path, binary_task, device, gpu)
-    evaluate_split_performance(model, loader_v, gpu, device, binary_task)
+    evaluate_split_performance(model, loader_v, gpu, device, binary_task, roc_plot_path)
     print("\nTest\n")
     loader_test = load_data(test_csv, embed_path, binary_task, device, gpu)
-    evaluate_split_performance(model, loader_test, gpu, device, binary_task)
+    evaluate_split_performance(model, loader_test, gpu, device, binary_task, roc_plot_path)
     print("\nTrain\n")
     loader_train = load_data(train_csv, embed_path, binary_task, device, gpu)
-    evaluate_split_performance(model, loader_train, gpu, device, binary_task)
+    evaluate_split_performance(model, loader_train, gpu, device, binary_task, roc_plot_path)
     return
 
 

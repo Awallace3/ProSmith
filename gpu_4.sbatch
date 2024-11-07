@@ -78,4 +78,5 @@ python3 -u ./eval.py \
     --val_csv $data_dir/train_val/val.csv \
     --pretrained_model $data_dir/saved_model/prosmith_${iter}_1gpus_bs12_1e-05_layers6.txt.pkl \
     --embed_path $data_dir/embeddings \
-    --binary_task $binary_task
+    --binary_task $binary_task \
+    --roc_plot_path ../phillip/plots/roc/prosmith_${iter}_roc.png 
