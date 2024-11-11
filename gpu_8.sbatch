@@ -1,16 +1,17 @@
 #!/bin/bash
-#SBATCH -JGPCR-4
-#SBATCH -ot4.out
+#SBATCH -JGPCR-8
+#SBATCH -ot8.out
 #SBATCH -Ahive-cs207
-#SBATCH -N1 --ntasks=1 --cpus-per-task=24 -G4
+#SBATCH -N1 --ntasks=1 --cpus-per-task=8 -G1
 #SBATCH --mem-per-cpu=8G
 #SBATCH -t72:00:00
 #SBATCH -phive-gpu
 #SBATCH --mail-type=START,END,FAIL
 #SBATCH --mail-user=awallace43@gatech.edu
 
+
 # VARS TO CHANGE - START
-export iter=4
+export iter=8
 export data_dir=./data_dir/prosmith_test$iter
 export binary_task=False
 # VARS TO CHANGE - END
@@ -19,32 +20,31 @@ cd $HOME/data/gits/gpcr_ml/phillip/
 source ~/data/miniconda3/etc/profile.d/conda.sh
 conda activate /storage/hive/project/chem-sherrill/awallace43/.conda/envs/prosmith
 
-# echo "python3 -u main.py --iter $iter"
-#
-# python3 -u main.py --iter $iter
+echo "python3 -u main.py --iter $iter"
+
+python3 -u main.py --iter $iter
 cd ../ProSmith/
 
-# echo "
-# python ./code/preprocessing/preprocessing.py \
-#     --train_val_path \
-#     $data_dir/train_val/ \
-#     --outpath \
-#     $data_dir/embeddings \
-#     --smiles_emb_no 2000 --prot_emb_no 2000
-# "
-#
-# python ./code/preprocessing/preprocessing.py \
-#     --train_val_path \
-#     $data_dir/train_val/ \
-#     --outpath \
-#     $data_dir/embeddings \
-#     --smiles_emb_no 2000 --prot_emb_no 2000
-#
-# echo "preprocessing done"
-echo 'resubmission to continue training...'
+echo "
+python ./code/preprocessing/preprocessing.py \
+    --train_val_path \
+    $data_dir/train_val/ \
+    --outpath \
+    $data_dir/embeddings \
+    --smiles_emb_no 2000 --prot_emb_no 2000
+"
+
+python ./code/preprocessing/preprocessing.py \
+    --train_val_path \
+    $data_dir/train_val/ \
+    --outpath \
+    $data_dir/embeddings \
+    --smiles_emb_no 2000 --prot_emb_no 2000
+
+echo "preprocessing done"
 
 echo "python ./code/training/training.py \
-    --pretrained_model $data_dir/saved_model \
+    --pretrained_model ./data_dir/prosmith_test4/saved_model/prosmith_4_4gpus_bs48_1e-05_layers6.txt.pkl \
     --train_dir $data_dir/train_val/train.csv \
     --val_dir $data_dir/train_val/test.csv \
     --save_model_path $data_dir/saved_model \
@@ -53,7 +53,7 @@ echo "python ./code/training/training.py \
     --log_name prosmith_$iter --num_train_epochs 100"
 
 python ./code/training/training.py \
-    --pretrained_model $data_dir/saved_model/prosmith_4_4gpus_bs48_1e-05_layers6.txt.pkl \
+    --pretrained_model ./data_dir/prosmith_test4/saved_model/prosmith_4_4gpus_bs48_1e-05_layers6.txt.pkl \
     --train_dir $data_dir/train_val/train.csv \
     --val_dir $data_dir/train_val/test.csv \
     --save_model_path $data_dir/saved_model \

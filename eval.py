@@ -584,9 +584,12 @@ def evaluate_split_performance(
 ):
     # print(f"dloader size: {len(dloader)}")
     if binary_task:
-        y_true, y_pred = eval_dataloader(model, dloader, gpu, device, binary_task)
+        y_true, y_pred_0 = eval_dataloader(model, dloader, gpu, device, binary_task)
         if binary_task:
-            y_pred = np.rint(y_pred)
+            y_pred = np.rint(y_pred_0)
+            y_pred_0 = np.array(y_pred_0)
+        else:
+            y_pred = np.array(y_pred_0)
         results = np.hstack((y_true, y_pred))
         y_true = results[:, 0]
         y_pred = results[:, 1]
@@ -610,7 +613,7 @@ def evaluate_split_performance(
         print(
             f"PRED binding : non-binding = {binding_ligands_cnt_pred} : {vals - binding_ligands_cnt_pred}"
         )
-        fpr, tpr, thresholds = metrics.roc_curve(y_true, y_pred)
+        fpr, tpr, thresholds = metrics.roc_curve(y_true, y_pred_0)
         roc_auc = metrics.auc(fpr, tpr)
         display = metrics.RocCurveDisplay(
             fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="example estimator"
@@ -693,11 +696,14 @@ def main():
     model = load_model(pretrained_model, device, binary_task)
     print("\nVal\n")
     loader_v = load_data(val_csv, embed_path, binary_task, device, gpu)
+    roc_plot_path = roc_plot_path.replace(".png", "_val.png")
     evaluate_split_performance(model, loader_v, gpu, device, binary_task, roc_plot_path)
     print("\nTest\n")
+    roc_plot_path = roc_plot_path.replace("_val.png", "_test.png")
     loader_test = load_data(test_csv, embed_path, binary_task, device, gpu)
     evaluate_split_performance(model, loader_test, gpu, device, binary_task, roc_plot_path)
     print("\nTrain\n")
+    roc_plot_path = roc_plot_path.replace("_test.png", "_train.png")
     loader_train = load_data(train_csv, embed_path, binary_task, device, gpu)
     evaluate_split_performance(model, loader_train, gpu, device, binary_task, roc_plot_path)
     return
