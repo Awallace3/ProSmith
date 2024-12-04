@@ -622,12 +622,45 @@ def evaluate_split_performance(
         plt.savefig(plot_ROC_path)
     else:
         y_true, y_pred = eval_dataloader(model, dloader, gpu, device, binary_task)
+
         results = np.hstack((y_true, y_pred))
         # MSE loss
         loss = np.mean((results[:, 0] - results[:, 1]) ** 2)
         print(f"MSE Loss: {loss}")
         # print(f"R2 score: {r_squared_error(y_true, y_pred)}")
         print(results[:10, :])
+
+        # create N-unique bins of y_true data
+        labels = np.unique(y_true)
+        # print(f"bins: {bins}")
+        if len(labels) < 20:
+            print(f"labels: {labels}")
+            # get midpoint between each bin
+            bin_midpoints = [(labels[i] + labels[i + 1]) / 2 for i in range(len(labels) - 1)]
+            # bins = [labels[0]]
+            bins = [np.min(y_pred)]
+            bins.extend(bin_midpoints)
+            bins.append(np.max(y_pred))
+            print(f"bins: {bins}")
+            print(f"bin_midpoints: {bin_midpoints}")
+            # identify how many y_pred values fall into each bin +- midpoint
+            bin_counts_pred = []
+            for i in range(len(bins) - 1):
+                # print(bins[i], bins[i + 1])
+                bin_counts_pred.append(
+                    np.sum(
+                        np.logical_and(
+                            y_pred >= bins[i], y_pred < bins[i + 1]
+                        )
+                    )
+                )
+            bin_counts_true = np.histogram(y_true, bins=bins)[0]
+            print(f"bin_counts_true: {bin_counts_true}")
+            print(f"bin_counts_pred: {bin_counts_pred}")
+            y_pred_labels = np.digitize(y_pred, bins)
+            # y_pred_labels = np.array([bins[i] for i in y_pred_labels])
+            results_labels = np.hstack((y_true, y_pred_labels, y_pred))
+            print(results_labels[:10, :])
     return
 
 

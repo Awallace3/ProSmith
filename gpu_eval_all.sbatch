@@ -33,24 +33,21 @@ python ./code/preprocessing/preprocessing.py \
     --smiles_emb_no 2000 --prot_emb_no 2000
 "
 
-for iter in 1 2 3 4 5 6 7 8 9 10; do
+for iter in 1 2 4 7 8 9 10; do
     export data_dir=./data_dir/prosmith_test${iter}
     echo "
-    python3 -u ./eval.py \
-        --train_csv $data_dir_val/train_val/train.csv \
-        --test_csv $data_dir_val/train_val/test.csv \
+    python3 -u ./eval_zinc.py \
         --val_csv $data_dir_val/train_val/val.csv \
         --pretrained_model $data_dir/saved_model/prosmith_${iter}_1gpus_bs12_1e-05_layers6.txt.pkl \
         --embed_path $data_dir_val/embeddings \
         --binary_task $binary_task
     "
 
-    python3 -u ./eval.py \
-        --train_csv $data_dir_val/train_val/train.csv \
-        --test_csv $data_dir_val/train_val/test.csv \
+    python3 -u ./eval_zinc.py \
         --val_csv $data_dir_val/train_val/val.csv \
         --pretrained_model $data_dir/saved_model/prosmith_${iter}_1gpus_bs12_1e-05_layers6.txt.pkl \
         --embed_path $data_dir_val/embeddings \
         --binary_task $binary_task \
-        --roc_plot_path ../phillip/plots/roc/prosmith_${iter}_roc.png 
+        --roc_plot_path ../phillip/plots/roc/prosmith_${iter}_roc.png \
+        --output_csv ../phillip/results/prosmith_${iter}_results_on_t7val.csv
 done

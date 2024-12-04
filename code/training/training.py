@@ -118,7 +118,7 @@ def get_arguments():
     return parser.parse_args()
 
 args = get_arguments()
-
+print(args)
 
 n_gpus = len(list(range(torch.cuda.device_count())))
 eff_bs =  n_gpus*args.batch_size
